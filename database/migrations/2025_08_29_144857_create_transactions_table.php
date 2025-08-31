@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
-            $table->date('date')->unique();
+            $table->string('code')->index();
+            $table->date('date');
 
             $table->foreignId('wallet_id')->constrained('wallets')->cascadeOnDelete();
             $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
