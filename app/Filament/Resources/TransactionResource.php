@@ -36,14 +36,22 @@ class TransactionResource extends Resource
                     ->schema([
                         Forms\Components\DatePicker::make('date')
                             ->required()
-                            ->default(now()),
+                            ->default(now())
+                            ->disabled(function (Forms\Get $get) {
+                                $status = $get('status');
+                                return $status && $status !== 'pending';
+                            }),
 
                         Forms\Components\Select::make('wallet_id')
                             ->label('Wallet')
                             ->relationship('wallet', 'name')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->disabled(function (Forms\Get $get) {
+                                $status = $get('status');
+                                return $status && $status !== 'pending';
+                            }),
 
                         Forms\Components\Select::make('type')
                             ->options([
@@ -54,6 +62,10 @@ class TransactionResource extends Resource
                             ->live()
                             ->afterStateUpdated(function (Forms\Set $set) {
                                 $set('category_id', null);
+                            })
+                            ->disabled(function (Forms\Get $get) {
+                                $status = $get('status');
+                                return $status && $status !== 'pending';
                             }),
 
                         Forms\Components\Select::make('category_id')
@@ -71,7 +83,11 @@ class TransactionResource extends Resource
                             )
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->disabled(function (Forms\Get $get) {
+                                $status = $get('status');
+                                return $status && $status !== 'pending';
+                            }),
 
                         Forms\Components\TextInput::make('amount')
                             ->required()
@@ -294,7 +310,8 @@ class TransactionResource extends Resource
                             }
                         }),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

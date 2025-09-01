@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\DB;
 
 class EditTransaction extends EditRecord
 {
@@ -37,9 +38,12 @@ class EditTransaction extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // If transaction was approved and amount/type changed, adjust wallet balance
+
+        $amount = isset($data['amount']) ? $data['amount'] : $this->record->amount;
+        $type = isset($data['type']) ? $data['type'] : $this->record->type;
         if (
             $this->record->status === 'approved' &&
-            ($this->record->amount != $data['amount'] || $this->record->type != $data['type'])
+            ($this->record->amount != $amount || $this->record->type != $type)
         ) {
 
             DB::transaction(function () use ($data) {
